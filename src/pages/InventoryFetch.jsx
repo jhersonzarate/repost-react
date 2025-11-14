@@ -1,27 +1,26 @@
-import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
+import EditProductModal from '../components/EditProductModal';
 import ApiSelector from '../components/ApiSelector';
 import { 
   obtenerProductosFetch, 
-  eliminarProductoFetch 
+  eliminarProductoFetch,
+  actualizarProductoFetch
 } from '../services/fetchService';
 
-/**
- * Página InventoryFetch
- * Gestión de inventario utilizando Fetch API nativo
- * Demuestra el uso de fetch() para operaciones CRUD
- */
 function InventoryFetch() {
+  // Estados principales
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingProduct, setEditingProduct] = useState(null); // Producto seleccionado para editar
 
-  // Cargar productos al montar el componente
+  // Cargar productos al entrar en la página
   useEffect(() => {
     cargarProductos();
   }, []);
 
+  // GET - Obtener lista desde Fetch API
   const cargarProductos = async () => {
     setLoading(true);
     setError('');
@@ -30,29 +29,43 @@ function InventoryFetch() {
       setProductos(data);
     } catch (err) {
       console.error('Error al cargar productos:', err);
-      setError('No se pudieron cargar los productos. Verifique su conexión.');
+      setError('No se pudieron cargar los productos.');
     } finally {
       setLoading(false);
     }
   };
 
+  // DELETE - Eliminar producto
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Está seguro de eliminar este producto?')) {
-      return;
-    }
+    if (!window.confirm('¿Está seguro de eliminar este producto?')) return;
 
     try {
       await eliminarProductoFetch(id);
-      // Actualizar la lista sin recargar desde el servidor
-      setProductos(productos.filter(p => p.id !== id));
-      alert('Producto eliminado exitosamente');
+      setProductos(productos.filter(p => p.id !== id)); // Actualizar lista local
+      alert('Producto eliminado correctamente');
     } catch (err) {
       console.error('Error al eliminar producto:', err);
       alert('Error al eliminar el producto');
     }
   };
 
-  // Filtrar productos según el término de búsqueda
+  // Abrir modal con el producto actual
+  const handleEdit = (producto) => {
+    setEditingProduct(producto);
+  };
+
+  // PUT/PATCH - Guardar cambios
+  const handleSave = async (id, data) => {
+    try {
+      await actualizarProductoFetch(id, data);
+      await cargarProductos(); // Refrescar inventario
+    } catch (err) {
+      console.error('Error al actualizar producto:', err);
+      throw err; // Para mostrar error en el modal
+    }
+  };
+
+  // Filtrar por nombre o categoría
   const productosFiltrados = productos.filter(producto =>
     producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
     producto.categoria.toLowerCase().includes(searchTerm.toLowerCase())
@@ -62,15 +75,12 @@ function InventoryFetch() {
     <div className="inventory-page">
       <ApiSelector />
 
+      {/* Encabezado */}
       <div className="inventory-header">
         <div className="header-content">
-          <h1 className="page-title">
-            Inventario con Fetch API
-          </h1>
+          <h1 className="page-title">Inventario con Fetch API</h1>
           <p className="page-description">
-            Esta página utiliza <strong>Fetch API</strong>, el método nativo de JavaScript
-            para realizar peticiones HTTP. Es estándar del navegador y no requiere
-            dependencias externas.
+            Esta página utiliza Fetch API, el método nativo de JavaScript para peticiones HTTP.
           </p>
         </div>
 
@@ -85,9 +95,9 @@ function InventoryFetch() {
           />
         </div>
 
-        {/* Botón de recargar */}
+        {/* Recargar datos */}
         <button 
-          onClick={cargarProductos} 
+          onClick={cargarProductos}
           className="btn-reload"
           disabled={loading}
         >
@@ -95,7 +105,7 @@ function InventoryFetch() {
         </button>
       </div>
 
-      {/* Estados de carga y error */}
+      {/* Loading */}
       {loading && (
         <div className="loading-container">
           <div className="spinner"></div>
@@ -103,15 +113,15 @@ function InventoryFetch() {
         </div>
       )}
 
+      {/* Error */}
       {error && (
-        <div className="alert alert-error">
-          {error}
-        </div>
+        <div className="alert alert-error">{error}</div>
       )}
 
-      {/* Lista de productos */}
+      {/* Contenido */}
       {!loading && !error && (
         <>
+          {/* Estadísticas */}
           <div className="inventory-stats">
             <div className="stat-card">
               <span className="stat-value">{productosFiltrados.length}</span>
@@ -125,6 +135,7 @@ function InventoryFetch() {
             </div>
           </div>
 
+          {/* Lista vacía */}
           {productosFiltrados.length === 0 ? (
             <div className="empty-state">
               <p>📦 No se encontraron productos</p>
@@ -138,17 +149,28 @@ function InventoryFetch() {
               )}
             </div>
           ) : (
+            // Renderizar productos
             <div className="products-grid">
               {productosFiltrados.map(producto => (
                 <ProductCard
                   key={producto.id}
                   producto={producto}
                   onDelete={handleDelete}
+                  onEdit={handleEdit}
                 />
               ))}
             </div>
           )}
         </>
+      )}
+
+      {/* Modal de edición */}
+      {editingProduct && (
+        <EditProductModal
+          producto={editingProduct}
+          onClose={() => setEditingProduct(null)}
+          onSave={handleSave}
+        />
       )}
     </div>
   );

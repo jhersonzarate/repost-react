@@ -3,20 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import ProductForm from '../components/ProductForm';
 import { agregarProducto } from '../services/supabaseClient';
 
-/**
- * Página AddProduct
- * Formulario para agregar nuevos productos al inventario
- * Utiliza el cliente directo de Supabase para la inserción
- */
 function AddProduct() {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
 
+  /**
+   * Envía los datos del producto a Supabase.
+   * Muestra un indicador de carga y redirige tras guardar.
+   */
   const handleSubmit = async (productoData) => {
     setSubmitting(true);
     try {
       await agregarProducto(productoData);
-      // Redirigir al inventario después de agregar
+
+      // Redirigir al inventario tras registrar el producto
       setTimeout(() => {
         navigate('/fetch');
       }, 1500);
@@ -29,7 +29,9 @@ function AddProduct() {
   };
 
   return (
-  <div className="add-product-page">
+    <div className="add-product-page">
+
+      {/* Encabezado de la página */}
       <div className="page-header">
         <h1 className="page-title">Agregar Nuevo Producto</h1>
         <p className="page-description">
@@ -38,6 +40,7 @@ function AddProduct() {
         </p>
       </div>
 
+      {/* Formulario principal */}
       <div className="form-container">
         <ProductForm 
           onSubmit={handleSubmit}
@@ -45,6 +48,7 @@ function AddProduct() {
         />
       </div>
 
+      {/* Modal de carga mientras se envían los datos */}
       {submitting && (
         <div className="overlay">
           <div className="loading-modal">
@@ -54,6 +58,7 @@ function AddProduct() {
         </div>
       )}
 
+      {/* Recomendaciones para el usuario */}
       <div className="info-box">
         <h3>📌 Instrucciones</h3>
         <ul>
@@ -63,6 +68,7 @@ function AddProduct() {
           <li>El stock no puede ser negativo</li>
         </ul>
       </div>
+
     </div>
   );
 }

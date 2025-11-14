@@ -1,10 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-/**
- * Configuración del cliente de Supabase
- * Utilizamos las variables de entorno para proteger las credenciales
- * El cliente se exporta para ser utilizado en toda la aplicación
- */
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
 
@@ -18,8 +13,6 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 
 /**
  * FUNCIONES CRUD PARA PRODUCTOS
- * Estas funciones utilizan el cliente de Supabase para realizar operaciones
- * en la base de datos de forma directa (no REST API)
  */
 
 // Obtener todos los productos con información del proveedor
@@ -29,7 +22,6 @@ export const obtenerProductos = async () => {
       .from('productos')
       .select('*, proveedores(nombre, contacto)')
       .order('id', { ascending: false });
-    
     if (error) throw error;
     return data;
   } catch (error) {
@@ -46,7 +38,6 @@ export const obtenerProductoPorId = async (id) => {
       .select('*, proveedores(nombre, contacto)')
       .eq('id', id)
       .single();
-    
     if (error) throw error;
     return data;
   } catch (error) {
@@ -62,7 +53,6 @@ export const agregarProducto = async (producto) => {
       .from('productos')
       .insert([producto])
       .select();
-    
     if (error) throw error;
     return data;
   } catch (error) {
@@ -79,7 +69,6 @@ export const actualizarProducto = async (id, producto) => {
       .update(producto)
       .eq('id', id)
       .select();
-    
     if (error) throw error;
     return data;
   } catch (error) {
@@ -95,7 +84,6 @@ export const eliminarProducto = async (id) => {
       .from('productos')
       .delete()
       .eq('id', id);
-    
     if (error) throw error;
     return { success: true };
   } catch (error) {
@@ -113,7 +101,6 @@ export const obtenerProveedores = async () => {
       .from('proveedores')
       .select('*')
       .order('nombre', { ascending: true });
-    
     if (error) throw error;
     return data;
   } catch (error) {
@@ -131,7 +118,6 @@ export const obtenerVentas = async () => {
       .from('ventas')
       .select('*, productos(nombre, precio), usuarios(nombre)')
       .order('fecha_venta', { ascending: false });
-    
     if (error) throw error;
     return data;
   } catch (error) {
@@ -146,7 +132,6 @@ export const registrarVenta = async (venta) => {
       .from('ventas')
       .insert([venta])
       .select();
-    
     if (error) throw error;
     return data;
   } catch (error) {
@@ -164,7 +149,6 @@ export const obtenerMovimientos = async () => {
       .from('movimientos_inventario')
       .select('*, productos(nombre)')
       .order('fecha_movimiento', { ascending: false });
-    
     if (error) throw error;
     return data;
   } catch (error) {
@@ -179,7 +163,6 @@ export const registrarMovimiento = async (movimiento) => {
       .from('movimientos_inventario')
       .insert([movimiento])
       .select();
-    
     if (error) throw error;
     return data;
   } catch (error) {
@@ -197,7 +180,6 @@ export const obtenerUsuarios = async () => {
       .from('usuarios')
       .select('*')
       .order('nombre', { ascending: true });
-    
     if (error) throw error;
     return data;
   } catch (error) {

@@ -1,26 +1,27 @@
+// Página de inventario con Alova
 import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
+import EditProductModal from '../components/EditProductModal'; // Modal de edición
 import ApiSelector from '../components/ApiSelector';
 import { 
   obtenerProductosAlova, 
-  eliminarProductoAlova 
+  eliminarProductoAlova,
+  actualizarProductoAlova
 } from '../services/alovaService';
 
-/**
- * Página InventoryAlova
- * Gestión de inventario utilizando Alova
- * Demuestra el uso de Alova, una librería moderna con caché y optimizaciones
- */
+// Página InventoryAlova (CRUD completo con Alova)
 function InventoryAlova() {
-  const [productos, setProductos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [productos, setProductos] = useState([]);      // Lista de productos
+  const [loading, setLoading] = useState(true);        // Estado de carga
+  const [error, setError] = useState('');              // Mensaje de error
+  const [searchTerm, setSearchTerm] = useState('');    // Búsqueda
+  const [editingProduct, setEditingProduct] = useState(null); // Producto a editar
 
   useEffect(() => {
-    cargarProductos();
+    cargarProductos(); // Cargar al inicio
   }, []);
 
+  // GET - Cargar productos desde Alova
   const cargarProductos = async () => {
     setLoading(true);
     setError('');
@@ -28,28 +29,41 @@ function InventoryAlova() {
       const data = await obtenerProductosAlova();
       setProductos(data);
     } catch (err) {
-      console.error('Error al cargar productos:', err);
-      setError('No se pudieron cargar los productos. Verifique su conexión.');
+      setError('No se pudieron cargar los productos.');
     } finally {
       setLoading(false);
     }
   };
 
+  // DELETE - Eliminar producto
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Está seguro de eliminar este producto?')) {
-      return;
-    }
+    if (!window.confirm('¿Eliminar producto?')) return;
 
     try {
       await eliminarProductoAlova(id);
       setProductos(productos.filter(p => p.id !== id));
-      alert('Producto eliminado exitosamente');
+      alert('Producto eliminado');
     } catch (err) {
-      console.error('Error al eliminar producto:', err);
-      alert('Error al eliminar el producto');
+      alert('Error al eliminar');
     }
   };
 
+  // Abrir modal de edición
+  const handleEdit = (producto) => {
+    setEditingProduct(producto);
+  };
+
+  // PUT/PATCH - Guardar cambios
+  const handleSave = async (id, data) => {
+    try {
+      await actualizarProductoAlova(id, data);
+      await cargarProductos(); // Recargar inventario
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  // Filtrar por texto
   const productosFiltrados = productos.filter(producto =>
     producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
     producto.categoria.toLowerCase().includes(searchTerm.toLowerCase())
@@ -59,28 +73,27 @@ function InventoryAlova() {
     <div className="inventory-page">
       <ApiSelector />
 
+      {/* Encabezado */}
       <div className="inventory-header">
         <div className="header-content">
-          <h1 className="page-title">
-            Inventario con Alova
-          </h1>
+          <h1 className="page-title">Inventario con Alova</h1>
           <p className="page-description">
-            Esta página utiliza <strong>Alova</strong>, una librería moderna que optimiza
-            las peticiones HTTP con caché automático, estados de carga integrados y
-            menor tamaño de bundle comparado con otras soluciones.
+            Ejemplo de CRUD usando Alova con caché y optimización.
           </p>
         </div>
 
+        {/* Barra de búsqueda */}
         <div className="search-bar">
           <input
             type="text"
-            placeholder="🔍 Buscar productos..."
+            placeholder="🔍 Buscar..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
         </div>
 
+        {/* Botón recargar */}
         <button 
           onClick={cargarProductos} 
           className="btn-reload"
@@ -90,37 +103,40 @@ function InventoryAlova() {
         </button>
       </div>
 
+      {/* Estado cargando */}
       {loading && (
         <div className="loading-container">
           <div className="spinner"></div>
-          <p>Cargando productos con Alova...</p>
+          <p>Cargando productos...</p>
         </div>
       )}
 
+      {/* Estado error */}
       {error && (
-        <div className="alert alert-error">
-          {error}
-        </div>
+        <div className="alert alert-error">{error}</div>
       )}
 
+      {/* Listado de productos */}
       {!loading && !error && (
         <>
+          {/* Estadísticas */}
           <div className="inventory-stats">
             <div className="stat-card">
               <span className="stat-value">{productosFiltrados.length}</span>
-              <span className="stat-label">Productos encontrados</span>
+              <span className="stat-label">Productos</span>
             </div>
             <div className="stat-card">
               <span className="stat-value">
                 {productosFiltrados.reduce((sum, p) => sum + p.stock, 0)}
               </span>
-              <span className="stat-label">Unidades en stock</span>
+              <span className="stat-label">Stock total</span>
             </div>
           </div>
 
+          {/* Vacío o listado */}
           {productosFiltrados.length === 0 ? (
             <div className="empty-state">
-              <p>📦 No se encontraron productos</p>
+              <p>📦 No hay productos</p>
               {searchTerm && (
                 <button 
                   onClick={() => setSearchTerm('')}
@@ -137,11 +153,21 @@ function InventoryAlova() {
                   key={producto.id}
                   producto={producto}
                   onDelete={handleDelete}
+                  onEdit={handleEdit} // Pasar acción de editar
                 />
               ))}
             </div>
           )}
         </>
+      )}
+
+      {/* Modal de edición */}
+      {editingProduct && (
+        <EditProductModal
+          producto={editingProduct}
+          onClose={() => setEditingProduct(null)}
+          onSave={handleSave}
+        />
       )}
     </div>
   );

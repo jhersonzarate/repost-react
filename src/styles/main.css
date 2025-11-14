@@ -1,8 +1,3 @@
-/* ============================================
-   SISTEMA DE CONTROL DE INVENTARIO
-   Estilos principales - main.css
-   Proyecto académico - 6º ciclo
-   ============================================ */
 
 /* ===== RESET Y CONFIGURACIÓN BASE ===== */
 * {
@@ -1220,3 +1215,236 @@ html {
   background-color: var(--primary-light);
   color: white;
 }
+
+/* ============================================
+   ESTILOS ADICIONALES PARA EDICIÓN (PUT/PATCH)
+   Agregar estas líneas AL FINAL de src/styles/main.css
+   ============================================ */
+
+/* ===== MODAL DE EDICIÓN ===== */
+.modal-content {
+  background: var(--bg-primary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-2xl);
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  padding: var(--spacing-xs);
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: var(--danger-color);
+  transform: scale(1.1);
+}
+
+.modal-body {
+  margin-bottom: var(--spacing-xl);
+}
+
+.modal-footer {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-secondary {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 1rem;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #475569;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== BOTÓN DE EDITAR EN PRODUCT CARD ===== */
+.btn-edit {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.95rem;
+}
+
+.btn-edit:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Ajustar grid de botones en ProductCard para 2 columnas */
+.product-actions {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+}
+
+/* Asegurar que ambos botones tengan el mismo tamaño */
+.btn-edit,
+.btn-delete {
+  flex: 1;
+}
+
+/* ===== OVERLAY MEJORADO ===== */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: var(--spacing-lg);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Animación del modal */
+.modal-content {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE PARA MODAL ===== */
+@media (max-width: 768px) {
+  .modal-content {
+    max-width: 95%;
+    padding: var(--spacing-lg);
+  }
+
+  .modal-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+  }
+
+  .btn-secondary,
+  .btn-submit {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .overlay {
+    padding: var(--spacing-sm);
+  }
+
+  .modal-content {
+    padding: var(--spacing-md);
+  }
+
+  .product-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    width: 100%;
+  }
+}
+
+/* ===== MEJORAS VISUALES ADICIONALES ===== */
+/* Efecto hover mejorado para las tarjetas de producto */
+.product-card:hover .product-actions {
+  opacity: 1;
+}
+
+.product-actions {
+  opacity: 0.9;
+  transition: var(--transition);
+}
+
+/* Indicador visual cuando el modal está abierto */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Estilo para inputs del modal cuando tienen foco */
+.modal-body .form-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Destacar campos requeridos */
+.modal-body .form-label::after {
+  content: '';
+}
+
+.modal-body label:has(+ input[required])::after,
+.modal-body label:has(+ select[required])::after {
+  content: ' *';
+  color: var(--danger-color);
+}
+
+/* ===== FIN DE ESTILOS PARA EDICIÓN ===== */

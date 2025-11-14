@@ -1,14 +1,15 @@
 import { Link, useLocation } from 'react-router-dom';
 
 /**
- * Componente ApiSelector
- * Permite cambiar entre las diferentes implementaciones de API
- * (Fetch, Axios, Alova) para comparar su funcionamiento
+ * Selector de método de consumo de API.
+ * Muestra y resalta la opción activa según la ruta.
  */
 function ApiSelector() {
   const location = useLocation();
 
-  // Determinar qué API está activa según la ruta
+  /**
+   * Retorna el método activo según la ruta actual.
+   */
   const getActiveApi = () => {
     if (location.pathname.includes('fetch')) return 'fetch';
     if (location.pathname.includes('axios')) return 'axios';
@@ -21,11 +22,14 @@ function ApiSelector() {
   return (
     <div className="api-selector">
       <div className="api-selector-container">
+        {/* Título del selector */}
         <h3 className="api-selector-title">
           Seleccione el método de consumo de API:
         </h3>
 
+        {/* Opciones de APIs */}
         <div className="api-buttons">
+          {/* Opción Fetch */}
           <Link 
             to="/fetch" 
             className={`api-button ${activeApi === 'fetch' ? 'active' : ''}`}
@@ -37,6 +41,7 @@ function ApiSelector() {
             </div>
           </Link>
 
+          {/* Opción Axios */}
           <Link 
             to="/axios" 
             className={`api-button ${activeApi === 'axios' ? 'active' : ''}`}
@@ -48,6 +53,7 @@ function ApiSelector() {
             </div>
           </Link>
 
+          {/* Opción Alova */}
           <Link 
             to="/alova" 
             className={`api-button ${activeApi === 'alova' ? 'active' : ''}`}
@@ -60,40 +66,43 @@ function ApiSelector() {
           </Link>
         </div>
 
+        {/* Información contextual según método seleccionado */}
         {activeApi && (
           <div className="api-info-box">
             {activeApi === 'fetch' && (
               <>
                 <h4>Fetch API</h4>
-                <p>API nativa de JavaScript para realizar peticiones HTTP. No requiere instalación de dependencias adicionales.</p>
+                <p>API nativa del navegador para solicitudes HTTP.</p>
                 <ul>
                   <li>✅ Nativo del navegador</li>
                   <li>✅ Basado en Promesas</li>
-                  <li>⚠️ Requiere más código para configuración</li>
+                  <li>⚠️ Requiere más configuración manual</li>
                 </ul>
               </>
             )}
+
             {activeApi === 'axios' && (
               <>
                 <h4>Axios</h4>
-                <p>Librería HTTP basada en promesas. Ofrece una sintaxis más simple y características adicionales como interceptores.</p>
+                <p>Librería HTTP con sintaxis simple e interceptores.</p>
                 <ul>
-                  <li>✅ Sintaxis simplificada</li>
-                  <li>✅ Interceptores de peticiones/respuestas</li>
-                  <li>✅ Transformación automática de JSON</li>
-                  <li>✅ Manejo de errores mejorado</li>
+                  <li>✅ Sintaxis clara</li>
+                  <li>✅ Interceptores integrados</li>
+                  <li>✅ Manejo automático de JSON</li>
+                  <li>✅ Gestión de errores más robusta</li>
                 </ul>
               </>
             )}
+
             {activeApi === 'alova' && (
               <>
                 <h4>Alova</h4>
-                <p>Librería moderna de gestión de estado para peticiones HTTP con caché automático y optimizaciones.</p>
+                <p>Librería optimizada con caché y estados de carga.</p>
                 <ul>
                   <li>✅ Caché automático</li>
-                  <li>✅ Estados de carga integrados</li>
+                  <li>✅ Estados integrados</li>
                   <li>✅ Optimización de peticiones</li>
-                  <li>✅ Menor tamaño de bundle</li>
+                  <li>✅ Ligera y moderna</li>
                 </ul>
               </>
             )}

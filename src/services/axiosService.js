@@ -1,16 +1,10 @@
 import axios from 'axios';
 
-/**
- * Servicio de consumo de API REST usando Axios
- * Axios es una librería popular que simplifica las peticiones HTTP
- * y ofrece características adicionales como interceptores y manejo automático de JSON
- */
-
 // Configuración base de Axios para Supabase
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 
-// Creamos una instancia de Axios con configuración predeterminada
+// Instancia de Axios con configuración predeterminada
 const axiosInstance = axios.create({
   baseURL: `${SUPABASE_URL}/rest/v1`,
   headers: {
@@ -23,7 +17,7 @@ const axiosInstance = axios.create({
 
 /**
  * Interceptor de respuestas para manejo centralizado de errores
- * Esto nos permite capturar y procesar errores de forma uniforme
+ * Captura errores de forma uniforme
  */
 axiosInstance.interceptors.response.use(
   response => response,
@@ -35,7 +29,6 @@ axiosInstance.interceptors.response.use(
 
 /**
  * Obtener todos los productos con información del proveedor
- * Axios maneja automáticamente la conversión de JSON
  */
 export const obtenerProductosAxios = async () => {
   try {
@@ -51,7 +44,6 @@ export const obtenerProductosAxios = async () => {
 
 /**
  * Agregar un nuevo producto
- * Axios convierte automáticamente el objeto JavaScript a JSON
  */
 export const agregarProductoAxios = async (producto) => {
   try {
@@ -65,7 +57,7 @@ export const agregarProductoAxios = async (producto) => {
 
 /**
  * Actualizar un producto existente
- * Usamos el método patch para actualizaciones parciales
+ * Método PATCH para actualizaciones parciales
  */
 export const actualizarProductoAxios = async (id, producto) => {
   try {
@@ -82,7 +74,6 @@ export const actualizarProductoAxios = async (id, producto) => {
 
 /**
  * Eliminar un producto
- * Delete es más simple con Axios gracias a su sintaxis limpia
  */
 export const eliminarProductoAxios = async (id) => {
   try {

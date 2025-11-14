@@ -1,9 +1,3 @@
-/**
- * Servicio de consumo de API REST usando Fetch API nativo
- * Este archivo implementa las operaciones CRUD utilizando fetch()
- * que es el método estándar de JavaScript para realizar peticiones HTTP
- */
-
 // Configuración base de la API REST de Supabase
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
@@ -25,13 +19,9 @@ export const obtenerProductosFetch = async () => {
   try {
     const response = await fetch(
       `${BASE_URL}/productos?select=*,proveedores(nombre,contacto)&order=id.desc`,
-      { 
-        method: 'GET',
-        headers 
-      }
+      { method: 'GET', headers }
     );
 
-    // Verificamos si la respuesta fue exitosa
     if (!response.ok) {
       throw new Error(`Error HTTP: ${response.status}`);
     }
@@ -46,7 +36,6 @@ export const obtenerProductosFetch = async () => {
 
 /**
  * Agregar un nuevo producto
- * El método POST envía los datos en el cuerpo de la petición
  */
 export const agregarProductoFetch = async (producto) => {
   try {
@@ -70,7 +59,6 @@ export const agregarProductoFetch = async (producto) => {
 
 /**
  * Actualizar un producto existente
- * Usamos PATCH para actualización parcial y filtramos por ID
  */
 export const actualizarProductoFetch = async (id, producto) => {
   try {
@@ -94,7 +82,6 @@ export const actualizarProductoFetch = async (id, producto) => {
 
 /**
  * Eliminar un producto
- * DELETE requiere especificar el ID en la URL con el formato eq.{id}
  */
 export const eliminarProductoFetch = async (id) => {
   try {
@@ -121,10 +108,7 @@ export const obtenerProveedoresFetch = async () => {
   try {
     const response = await fetch(
       `${BASE_URL}/proveedores?order=nombre.asc`,
-      { 
-        method: 'GET',
-        headers 
-      }
+      { method: 'GET', headers }
     );
 
     if (!response.ok) {

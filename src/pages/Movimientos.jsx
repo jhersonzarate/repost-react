@@ -6,12 +6,8 @@ import {
   actualizarProducto
 } from '../services/supabaseClient';
 
-/**
- * Página Movimientos
- * Gestión de movimientos de inventario (entradas y salidas)
- * Permite registrar ajustes de stock con observaciones
- */
 function Movimientos() {
+  // Estados principales
   const [movimientos, setMovimientos] = useState([]);
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +22,7 @@ function Movimientos() {
     observacion: ''
   });
 
+  // Cargar datos iniciales
   useEffect(() => {
     cargarDatos();
   }, []);
@@ -47,6 +44,7 @@ function Movimientos() {
     }
   };
 
+  // Manejo de cambios en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -55,6 +53,7 @@ function Movimientos() {
     }));
   };
 
+  // Registrar un nuevo movimiento
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -63,9 +62,7 @@ function Movimientos() {
       return;
     }
 
-    // Obtener el producto seleccionado
     const producto = productos.find(p => p.id === parseInt(formData.producto_id));
-    
     if (!producto) {
       alert('Producto no encontrado');
       return;
@@ -73,36 +70,33 @@ function Movimientos() {
 
     const cantidad = parseInt(formData.cantidad);
 
-    // Validar para salidas que no exceda el stock
+    // Validación de stock para salidas
     if (formData.tipo === 'Salida' && cantidad > producto.stock) {
       alert(`Stock insuficiente. Solo hay ${producto.stock} unidades disponibles.`);
       return;
     }
 
     try {
-      // Registrar el movimiento
       const movimientoData = {
         producto_id: parseInt(formData.producto_id),
         tipo: formData.tipo,
-        cantidad: cantidad,
+        cantidad,
         observacion: formData.observacion.trim() || null,
         fecha_movimiento: new Date().toISOString()
       };
 
+      // Registrar movimiento
       await registrarMovimiento(movimientoData);
 
-      // Actualizar el stock según el tipo de movimiento
-      let nuevoStock;
-      if (formData.tipo === 'Entrada') {
-        nuevoStock = producto.stock + cantidad;
-      } else {
-        nuevoStock = producto.stock - cantidad;
-      }
+      // Actualizar stock del producto
+      const nuevoStock = formData.tipo === 'Entrada' 
+        ? producto.stock + cantidad 
+        : producto.stock - cantidad;
 
       await actualizarProducto(producto.id, { stock: nuevoStock });
 
       alert('Movimiento registrado exitosamente');
-      
+
       // Limpiar formulario y recargar datos
       setFormData({
         producto_id: '',
@@ -118,7 +112,7 @@ function Movimientos() {
     }
   };
 
-  // Formatear fecha
+  // Formatear fecha en estilo legible
   const formatearFecha = (fecha) => {
     return new Date(fecha).toLocaleDateString('es-PE', {
       year: 'numeric',
@@ -129,7 +123,7 @@ function Movimientos() {
     });
   };
 
-  // Filtrar movimientos por tipo
+  // Filtrar movimientos según tipo
   const movimientosFiltrados = filtroTipo === 'Todos' 
     ? movimientos 
     : movimientos.filter(m => m.tipo === filtroTipo);
@@ -139,16 +133,15 @@ function Movimientos() {
     const totalEntradas = movimientos
       .filter(m => m.tipo === 'Entrada')
       .reduce((sum, m) => sum + m.cantidad, 0);
-    
     const totalSalidas = movimientos
       .filter(m => m.tipo === 'Salida')
       .reduce((sum, m) => sum + m.cantidad, 0);
-
     return { totalEntradas, totalSalidas };
   };
 
   const estadisticas = calcularEstadisticas();
 
+  // Loading
   if (loading) {
     return (
       <div className="loading-container">
@@ -160,6 +153,7 @@ function Movimientos() {
 
   return (
     <div className="movimientos-page">
+      {/* Header */}
       <div className="page-header">
         <h1 className="page-title">📊 Movimientos de Inventario</h1>
         <button 
@@ -261,7 +255,7 @@ function Movimientos() {
         </div>
       )}
 
-      {/* Filtros */}
+      {/* Filtros por tipo */}
       <div className="filter-container">
         <label>Filtrar por tipo:</label>
         <div className="filter-buttons">

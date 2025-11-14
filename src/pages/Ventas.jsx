@@ -7,12 +7,8 @@ import {
   actualizarProducto
 } from '../services/supabaseClient';
 
-/**
- * Página Ventas
- * Gestión y registro de ventas realizadas
- * Actualiza automáticamente el stock del producto vendido
- */
 function Ventas() {
+  // Estados principales
   const [ventas, setVentas] = useState([]);
   const [productos, setProductos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
@@ -26,6 +22,7 @@ function Ventas() {
     cantidad: 1
   });
 
+  // Cargar datos iniciales
   useEffect(() => {
     cargarDatos();
   }, []);
@@ -49,6 +46,7 @@ function Ventas() {
     }
   };
 
+  // Manejo de cambios en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -57,35 +55,30 @@ function Ventas() {
     }));
   };
 
+  // Registrar nueva venta
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validar que se haya seleccionado un producto
     if (!formData.producto_id) {
       alert('Debe seleccionar un producto');
       return;
     }
 
-    // Obtener el producto seleccionado
     const producto = productos.find(p => p.id === parseInt(formData.producto_id));
-    
     if (!producto) {
       alert('Producto no encontrado');
       return;
     }
 
-    // Validar stock disponible
     const cantidadVenta = parseInt(formData.cantidad);
     if (cantidadVenta > producto.stock) {
       alert(`Stock insuficiente. Solo hay ${producto.stock} unidades disponibles.`);
       return;
     }
 
-    // Calcular total
     const total = producto.precio * cantidadVenta;
 
     try {
-      // Registrar la venta
       const ventaData = {
         producto_id: parseInt(formData.producto_id),
         usuario_id: parseInt(formData.usuario_id),
@@ -94,14 +87,15 @@ function Ventas() {
         fecha_venta: new Date().toISOString()
       };
 
+      // Registrar la venta en la base de datos
       await registrarVenta(ventaData);
 
-      // Actualizar el stock del producto
+      // Actualizar stock del producto
       const nuevoStock = producto.stock - cantidadVenta;
       await actualizarProducto(producto.id, { stock: nuevoStock });
 
       alert('Venta registrada exitosamente');
-      
+
       // Limpiar formulario y recargar datos
       setFormData({
         producto_id: '',
@@ -135,7 +129,7 @@ function Ventas() {
     });
   };
 
-  // Calcular estadísticas
+  // Calcular estadísticas de ventas
   const calcularEstadisticas = () => {
     const totalVentas = ventas.reduce((sum, v) => sum + parseFloat(v.total), 0);
     const totalUnidades = ventas.reduce((sum, v) => sum + v.cantidad, 0);
@@ -144,6 +138,7 @@ function Ventas() {
 
   const estadisticas = calcularEstadisticas();
 
+  // Mostrar loading mientras se cargan los datos
   if (loading) {
     return (
       <div className="loading-container">
@@ -155,6 +150,7 @@ function Ventas() {
 
   return (
     <div className="ventas-page">
+      {/* Header con botón de nuevo registro */}
       <div className="page-header">
         <h1 className="page-title">💰 Registro de Ventas</h1>
         <button 
@@ -258,7 +254,7 @@ function Ventas() {
         </div>
       )}
 
-      {/* Tabla de ventas */}
+      {/* Tabla de historial de ventas */}
       <div className="table-container">
         <h2>Historial de Ventas</h2>
         {ventas.length === 0 ? (

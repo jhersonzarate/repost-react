@@ -1,13 +1,4 @@
-/**
- * Componente ProductCard
- * Tarjeta individual para mostrar información de un producto
- * Incluye imagen, datos principales y acciones (editar/eliminar)
- * 
- * Props:
- * - producto: objeto con los datos del producto
- * - onDelete: función callback para eliminar el producto
- */
-function ProductCard({ producto, onDelete }) {
+function ProductCard({ producto, onDelete, onEdit }) {
   // Formatear el precio en formato de moneda
   const formatearPrecio = (precio) => {
     return new Intl.NumberFormat('es-PE', {
@@ -81,8 +72,18 @@ function ProductCard({ producto, onDelete }) {
           </div>
         </div>
 
-        {/* Botones de acción */}
+        {/* Botones de acción - ACTUALIZADOS CON EDITAR */}
         <div className="product-actions">
+          {/* ✅ NUEVO: Botón de editar */}
+          <button 
+            className="btn-edit"
+            onClick={() => onEdit(producto)}
+            aria-label="Editar producto"
+          >
+            ✏️ Editar
+          </button>
+
+          {/* Botón de eliminar existente */}
           <button 
             className="btn-delete"
             onClick={() => onDelete(producto.id)}

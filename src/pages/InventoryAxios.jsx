@@ -1,26 +1,27 @@
 import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
+import EditProductModal from '../components/EditProductModal'; // Modal de edición
 import ApiSelector from '../components/ApiSelector';
 import { 
   obtenerProductosAxios, 
-  eliminarProductoAxios 
+  eliminarProductoAxios,
+  actualizarProductoAxios
 } from '../services/axiosService';
 
-/**
- * Página InventoryAxios
- * Gestión de inventario utilizando Axios
- * Demuestra el uso de la librería Axios para operaciones CRUD
- */
 function InventoryAxios() {
+  // Estados principales
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingProduct, setEditingProduct] = useState(null); // Producto a editar
 
+  // Cargar productos al iniciar la página
   useEffect(() => {
     cargarProductos();
   }, []);
 
+  // GET - Obtener productos desde Axios
   const cargarProductos = async () => {
     setLoading(true);
     setError('');
@@ -29,27 +30,43 @@ function InventoryAxios() {
       setProductos(data);
     } catch (err) {
       console.error('Error al cargar productos:', err);
-      setError('No se pudieron cargar los productos. Verifique su conexión.');
+      setError('No se pudieron cargar los productos.');
     } finally {
       setLoading(false);
     }
   };
 
+  // DELETE - Eliminar producto
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Está seguro de eliminar este producto?')) {
-      return;
-    }
+    if (!window.confirm('¿Está seguro de eliminar este producto?')) return;
 
     try {
       await eliminarProductoAxios(id);
-      setProductos(productos.filter(p => p.id !== id));
-      alert('Producto eliminado exitosamente');
+      setProductos(productos.filter(p => p.id !== id)); // Actualizar lista
+      alert('Producto eliminado correctamente');
     } catch (err) {
       console.error('Error al eliminar producto:', err);
       alert('Error al eliminar el producto');
     }
   };
 
+  // Abrir modal con el producto seleccionado
+  const handleEdit = (producto) => {
+    setEditingProduct(producto);
+  };
+
+  // PUT/PATCH - Guardar cambios del producto
+  const handleSave = async (id, data) => {
+    try {
+      await actualizarProductoAxios(id, data);
+      await cargarProductos(); // Refrescar inventario
+    } catch (err) {
+      console.error('Error al actualizar producto:', err);
+      throw err; // Para que el modal muestre error
+    }
+  };
+
+  // Filtrar productos por nombre o categoría
   const productosFiltrados = productos.filter(producto =>
     producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
     producto.categoria.toLowerCase().includes(searchTerm.toLowerCase())
@@ -59,18 +76,16 @@ function InventoryAxios() {
     <div className="inventory-page">
       <ApiSelector />
 
+      {/* Encabezado */}
       <div className="inventory-header">
         <div className="header-content">
-          <h1 className="page-title">
-            Inventario con Axios
-          </h1>
+          <h1 className="page-title">Inventario con Axios</h1>
           <p className="page-description">
-            Esta página utiliza <strong>Axios</strong>, una librería HTTP basada en promesas
-            que simplifica las peticiones y ofrece características avanzadas como interceptores
-            y transformación automática de datos.
+            Página que usa Axios para realizar operaciones completas de inventario.
           </p>
         </div>
 
+        {/* Barra de búsqueda */}
         <div className="search-bar">
           <input
             type="text"
@@ -81,8 +96,9 @@ function InventoryAxios() {
           />
         </div>
 
+        {/* Botón recargar */}
         <button 
-          onClick={cargarProductos} 
+          onClick={cargarProductos}
           className="btn-reload"
           disabled={loading}
         >
@@ -90,6 +106,7 @@ function InventoryAxios() {
         </button>
       </div>
 
+      {/* Loading */}
       {loading && (
         <div className="loading-container">
           <div className="spinner"></div>
@@ -97,14 +114,15 @@ function InventoryAxios() {
         </div>
       )}
 
+      {/* Error */}
       {error && (
-        <div className="alert alert-error">
-          {error}
-        </div>
+        <div className="alert alert-error">{error}</div>
       )}
 
+      {/* Contenido cuando no hay errores */}
       {!loading && !error && (
         <>
+          {/* Estadísticas */}
           <div className="inventory-stats">
             <div className="stat-card">
               <span className="stat-value">{productosFiltrados.length}</span>
@@ -118,6 +136,7 @@ function InventoryAxios() {
             </div>
           </div>
 
+          {/* No hay productos */}
           {productosFiltrados.length === 0 ? (
             <div className="empty-state">
               <p>📦 No se encontraron productos</p>
@@ -137,11 +156,21 @@ function InventoryAxios() {
                   key={producto.id}
                   producto={producto}
                   onDelete={handleDelete}
+                  onEdit={handleEdit} // Abrir modal
                 />
               ))}
             </div>
           )}
         </>
+      )}
+
+      {/* Modal de edición */}
+      {editingProduct && (
+        <EditProductModal
+          producto={editingProduct}
+          onClose={() => setEditingProduct(null)}
+          onSave={handleSave}
+        />
       )}
     </div>
   );

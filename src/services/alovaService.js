@@ -1,9 +1,3 @@
-/**
- * Servicio de consumo de API REST usando Alova
- * NOTA: Para este proyecto usaremos fetch nativo encapsulado
- * debido a incompatibilidades con versiones de Alova
- */
-
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 const BASE_URL = `${SUPABASE_URL}/rest/v1`;
@@ -23,10 +17,7 @@ export const obtenerProductosAlova = async () => {
   try {
     const response = await fetch(
       `${BASE_URL}/productos?select=*,proveedores(nombre,contacto)&order=id.desc`,
-      { 
-        method: 'GET',
-        headers 
-      }
+      { method: 'GET', headers }
     );
 
     if (!response.ok) {
@@ -36,7 +27,7 @@ export const obtenerProductosAlova = async () => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error con Alova al obtener productos:', error);
+    console.error('Error al obtener productos:', error);
     throw error;
   }
 };
@@ -59,7 +50,7 @@ export const agregarProductoAlova = async (producto) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error con Alova al agregar producto:', error);
+    console.error('Error al agregar producto:', error);
     throw error;
   }
 };
@@ -82,7 +73,7 @@ export const actualizarProductoAlova = async (id, producto) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error con Alova al actualizar producto:', error);
+    console.error('Error al actualizar producto:', error);
     throw error;
   }
 };
@@ -103,7 +94,7 @@ export const eliminarProductoAlova = async (id) => {
 
     return { success: true };
   } catch (error) {
-    console.error('Error con Alova al eliminar producto:', error);
+    console.error('Error al eliminar producto:', error);
     throw error;
   }
 };
@@ -115,10 +106,7 @@ export const obtenerProveedoresAlova = async () => {
   try {
     const response = await fetch(
       `${BASE_URL}/proveedores?order=nombre.asc`,
-      { 
-        method: 'GET',
-        headers 
-      }
+      { method: 'GET', headers }
     );
 
     if (!response.ok) {
@@ -128,7 +116,7 @@ export const obtenerProveedoresAlova = async () => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error con Alova al obtener proveedores:', error);
+    console.error('Error al obtener proveedores:', error);
     throw error;
   }
 };

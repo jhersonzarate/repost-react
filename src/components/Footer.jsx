@@ -1,19 +1,19 @@
-/**
- * Componente Footer
- * Pie de página con información del proyecto y créditos
- * Diseño simple y profesional
- */
 function Footer() {
+  // Obtiene el año actual dinámicamente
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className="footer">
+      {/* Contenedor principal del footer */}
       <div className="footer-container">
+
+        {/* Sección: descripción del sistema */}
         <div className="footer-section">
           <h3>Control de Inventario</h3>
           <p>Sistema de gestión para tiendas de dispositivos electrónicos</p>
         </div>
 
+        {/* Sección: tecnologías usadas */}
         <div className="footer-section">
           <h4>Tecnologías</h4>
           <ul className="footer-list">
@@ -23,6 +23,7 @@ function Footer() {
           </ul>
         </div>
 
+        {/* Sección: información académica */}
         <div className="footer-section">
           <h4>Proyecto Académico</h4>
           <p>Ingeniería de Sistemas - 6º Ciclo</p>
@@ -30,8 +31,9 @@ function Footer() {
         </div>
       </div>
 
+      {/* Línea inferior con el año actual */}
       <div className="footer-bottom">
-        <p>&copy; {currentYear} - Proyecto Final de Curso</p>
+        <p>&copy; {currentYear} - Proyecto de Curso</p>
       </div>
     </footer>
   );
